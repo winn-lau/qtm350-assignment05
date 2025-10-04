@@ -1,0 +1,16 @@
+---
+title: "Exploratory Data Analysis on WDI Data"
+author: "Winnie Lau"
+date: "2025-10-08"
+format:
+  html: default
+  pdf: default
+---
+
+```{python}
+
+import pandas as pd
+
+
+
+```
