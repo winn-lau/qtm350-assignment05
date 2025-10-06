@@ -7,10 +7,96 @@ format:
   pdf: default
 ---
 
+## Introduction
+This exploratory data analysis focuses on 3 variables within the WDI dataset: GDP per capita, life expectancy, and unemployment rate. First, summary statistics were calculated to gain a general understanding of these variables. Mean, median, minimum value, maximum value, and standard deviation were calculated and displayed in @ref(tab:summary_stats). 
+
 ```{python}
+#| echo: true
+#| eval: true
+#| label: summary_stats
+#| tbl-cap: Summary statistics for GDP per capita, life expectancy, and unemployment rate
 
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import cm, colors
+
+wdi = pd.read_csv("wdi.csv")
+
+# table of summary statistics for the 3 variables
+cols = ["gdp_per_capita", "life_expectancy", "unemployment_rate"]
+df_num = wdi[cols].dropna()
+
+stats = df_num.agg(["mean", "median", "min", "max", "std"]).T
+stats = stats.rename_axis("variable").reset_index()
+
+# round for display
+stats[["mean", "median", "min", "max", "std"]] = stats[["mean", "median", "min", "max", "std"]].round(2)
+
+display(stats)
+```
 
 
+```{python}
+
+# gdp by life expectancy - scatterplot
+cols = ["gdp_per_capita", "life_expectancy"]
+df = wdi[cols].dropna()
+
+plt.figure(figsize=(8,6))
+plt.scatter(df["gdp_per_capita"], df["life_expectancy"], alpha=0.6)
+plt.xscale("log")
+plt.xlabel("GDP per capita (log scale)")
+plt.ylabel("Life expectancy (years)")
+plt.title("Worldwide GDP per capita vs Life Expectancy in 2022")
+plt.tight_layout()
+plt.show()
+
+```
+
+
+```{python}
+
+# find top and bottom 3 countries for gdp
+cols = ["country", "gdp_per_capita", "unemployment_rate"]
+df = wdi[cols].dropna()
+wdi_gdp_sorted = df.sort_values("gdp_per_capita", ascending=False)
+top3 = wdi_gdp_sorted.head(3)
+bottom3 = wdi_gdp_sorted.tail(3)
+top_bottom_3 = pd.concat([top3, bottom3], ignore_index=True)
+
+# top and bottom 3 (by gdp) by unemployment rate - bar graph
+
+# sort countries by descending gdp
+top_bottom_3 = top_bottom_3.sort_values("gdp_per_capita", ascending=False).reset_index(drop=True)
+
+x = np.arange(len(top_bottom_3))
+countries = top_bottom_3["country"]
+
+# color by log(GDP)
+log_gdp = np.log10(top_bottom_3["gdp_per_capita"])
+norm = colors.Normalize(vmin=log_gdp.min(), vmax=log_gdp.max())
+cmap = cm.viridis
+bar_colors = cmap(norm(log_gdp))
+
+plt.figure(figsize=(10,6))
+bars = plt.bar(x, top_bottom_3["unemployment_rate"], color=bar_colors)
+plt.xlabel("Country")
+plt.ylabel("Unemployment Rate")
+plt.title("Unemployment Rate for Top and Bottom Three GDP per Capita Countries")
+plt.xticks(x, countries, rotation=45, ha="right")
+
+# add colorbar for gdp
+sm = cm.ScalarMappable(cmap=cmap, norm=norm)
+sm.set_array([])
+cbar = plt.colorbar(sm)
+
+ticks = cbar.get_ticks()
+cbar.set_ticks(ticks)
+cbar.set_ticklabels([f"{10**t:.0f}" for t in ticks])
+cbar.set_label("GDP per capita (log scale)")
+
+plt.tight_layout()
+plt.show()
 
 ```
