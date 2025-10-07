@@ -57,7 +57,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="exploratory_da_files/libs/clipboard/clipboard.min.js"></script>
@@ -119,32 +139,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This exploratory data analysis focuses on 3 variables within the WDI dataset: GDP per capita, life expectancy, and unemployment rate. First, summary statistics were calculated to gain a general understanding of these variables. Mean, median, minimum value, maximum value, and standard deviation were calculated and displayed in <span class="citation" data-cites="ref">@ref</span>(tab:summary_stats).</p>
-<div class="cell" data-tbl-cap="Summary statistics for GDP per capita, life expectancy, and unemployment rate" data-execution_count="1">
+<p>This exploratory data analysis focuses on 3 variables within the WDI dataset: GDP per capita, life expectancy, and unemployment rate. First, summary statistics were calculated to gain a general understanding of these variables. Mean, median, minimum value, maximum value, and standard deviation were calculated and displayed in <a href="#tbl-summary_stats" class="quarto-xref">Table&nbsp;1</a>.</p>
+<div class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> cm, colors</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>wdi <span class="op">=</span> pd.read_csv(<span class="st">"wdi.csv"</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># table of summary statistics for the 3 variables</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">"gdp_per_capita"</span>, <span class="st">"life_expectancy"</span>, <span class="st">"unemployment_rate"</span>]</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>df_num <span class="op">=</span> wdi[cols].dropna()</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> df_num.agg([<span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"std"</span>]).T</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> stats.rename_axis(<span class="st">"variable"</span>).reset_index()</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># round for display</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>stats[[<span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"std"</span>]] <span class="op">=</span> stats[[<span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"std"</span>]].<span class="bu">round</span>(<span class="dv">2</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>display(stats)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div id="summary_stats" class="cell-output cell-output-display">
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.ticker <span class="im">import</span> FuncFormatter</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>wdi <span class="op">=</span> pd.read_csv(<span class="st">"wdi.csv"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># table of summary statistics for the 3 variables</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">"gdp_per_capita"</span>, <span class="st">"life_expectancy"</span>, <span class="st">"unemployment_rate"</span>]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>df_num <span class="op">=</span> wdi[cols].dropna()</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> df_num.agg([<span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"std"</span>]).T</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> stats.rename_axis(<span class="st">"variable"</span>).reset_index()</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># round for display</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>stats[[<span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"std"</span>]] <span class="op">=</span> stats[[<span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"min"</span>, <span class="st">"max"</span>, <span class="st">"std"</span>]].<span class="bu">round</span>(<span class="dv">2</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>display(stats)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-summary_stats" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-summary_stats-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Summary statistics for GDP per capita, life expectancy, and unemployment rate
+</figcaption>
+<div aria-describedby="tbl-summary_stats-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
 <div>
 
 
-<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
-<caption>Summary statistics for GDP per capita, life expectancy, and unemployment rate</caption>
+<table class="dataframe do-not-create-environment cell caption-top table table-sm table-striped small" data-border="1">
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
@@ -190,86 +216,60 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="c7fb3627" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># gdp by life expectancy - scatterplot</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">"gdp_per_capita"</span>, <span class="st">"life_expectancy"</span>]</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> wdi[cols].dropna()</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">6</span>))</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>plt.scatter(df[<span class="st">"gdp_per_capita"</span>], df[<span class="st">"life_expectancy"</span>], alpha<span class="op">=</span><span class="fl">0.6</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">"log"</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"GDP per capita (log scale)"</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Life expectancy (years)"</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Worldwide GDP per capita vs Life Expectancy in 2022"</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</figure>
+</div>
+</div>
+<p>Interestingly, there appears to be a large standard deviation for GDP per capita, indicating wide variation in economic status between the countries represented. Because of this, I was curious to learn more about GDP per capita and its relationship to the other variables.</p>
+</section>
+<section id="findings" class="level2">
+<h2 class="anchored" data-anchor-id="findings">Findings</h2>
+<p>To visualize the relationship between GDP per capita and life expectancy, the two variables were plotted against each other in a scatterplot, with the GDP per capita placed on a log scale for ease of visualization (<a href="#fig-gdp_life_exp" class="quarto-xref">Figure&nbsp;1</a>).</p>
+<div id="cell-fig-gdp_life_exp" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="exploratory_da_files/figure-html/cell-3-output-1.png" width="757" height="563" class="figure-img"></p>
+<div id="fig-gdp_life_exp" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-gdp_life_exp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="exploratory_da_files/figure-html/fig-gdp_life_exp-output-1.png" width="757" height="563" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gdp_life_exp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Scatterplot for the relationship between worldwide GDP per capita and life expectancy in 2022
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<div id="a18fa6e8" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find top and bottom 3 countries for gdp</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>cols <span class="op">=</span> [<span class="st">"country"</span>, <span class="st">"gdp_per_capita"</span>, <span class="st">"unemployment_rate"</span>]</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> wdi[cols].dropna()</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>wdi_gdp_sorted <span class="op">=</span> df.sort_values(<span class="st">"gdp_per_capita"</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>top3 <span class="op">=</span> wdi_gdp_sorted.head(<span class="dv">3</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>bottom3 <span class="op">=</span> wdi_gdp_sorted.tail(<span class="dv">3</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>top_bottom_3 <span class="op">=</span> pd.concat([top3, bottom3], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># top and bottom 3 (by gdp) by unemployment rate - bar graph</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># sort countries by descending gdp</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>top_bottom_3 <span class="op">=</span> top_bottom_3.sort_values(<span class="st">"gdp_per_capita"</span>, ascending<span class="op">=</span><span class="va">False</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.arange(<span class="bu">len</span>(top_bottom_3))</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>countries <span class="op">=</span> top_bottom_3[<span class="st">"country"</span>]</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># color by log(GDP)</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>log_gdp <span class="op">=</span> np.log10(top_bottom_3[<span class="st">"gdp_per_capita"</span>])</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> colors.Normalize(vmin<span class="op">=</span>log_gdp.<span class="bu">min</span>(), vmax<span class="op">=</span>log_gdp.<span class="bu">max</span>())</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>cmap <span class="op">=</span> cm.viridis</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>bar_colors <span class="op">=</span> cmap(norm(log_gdp))</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>bars <span class="op">=</span> plt.bar(x, top_bottom_3[<span class="st">"unemployment_rate"</span>], color<span class="op">=</span>bar_colors)</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Country"</span>)</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Unemployment Rate"</span>)</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Unemployment Rate for Top and Bottom Three GDP per Capita Countries"</span>)</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>plt.xticks(x, countries, rotation<span class="op">=</span><span class="dv">45</span>, ha<span class="op">=</span><span class="st">"right"</span>)</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co"># add colorbar for gdp</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>sm <span class="op">=</span> cm.ScalarMappable(cmap<span class="op">=</span>cmap, norm<span class="op">=</span>norm)</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>sm.set_array([])</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>cbar <span class="op">=</span> plt.colorbar(sm)</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>ticks <span class="op">=</span> cbar.get_ticks()</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>cbar.set_ticks(ticks)</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>cbar.set_ticklabels([<span class="ss">f"</span><span class="sc">{</span><span class="dv">10</span><span class="op">**</span>t<span class="sc">:.0f}</span><span class="ss">"</span> <span class="cf">for</span> t <span class="kw">in</span> ticks])</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>cbar.set_label(<span class="st">"GDP per capita (log scale)"</span>)</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/3g/kh8280_j3b5515nc6yp293880000gn/T/ipykernel_74316/3581728518.py:33: MatplotlibDeprecationWarning:
+<p>There is a clear positive relationship between GDP per capita and life expectancy. The higher the GDP of a country, the longer the life expectancy, and vice versa (<a href="#fig-gdp_life_exp" class="quarto-xref">Figure&nbsp;1</a>). This finding is in line with prior research into this field, which also found this positive relationship. It is considered that when GDP is high, it is an indicator of a country’s wealth. A wealthy government therefore can spend more money and resources on ensuring better quality of life and attention to healthcare. This would result in a healthy population, and by that logic, a longer life expectancy <span class="citation" data-cites="tarca2024">(<a href="#ref-tarca2024" role="doc-biblioref">Țarcă, Țarcă, and Moscalu 2024</a>)</span>.</p>
+<p>The relationship between GDP per capita and unemployment rate was also of interest. To narrow down the data for analysis, the 3 countries with the highest GDP per capita in 2022 and the 3 countries with the lowest GDP per capita were identified. Luxembourg, Norway, and Ireland landed in the top 3, while Central African Republic, Afghanistan, and Burundi were in the bottom 3 (<a href="#fig-unemp_rate" class="quarto-xref">Figure&nbsp;2</a>).</p>
+<div id="cell-fig-unemp_rate" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div id="fig-unemp_rate" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-unemp_rate-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="exploratory_da_files/figure-html/fig-unemp_rate-output-1.png" width="942" height="564" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-unemp_rate-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Bar graph of unemployment rate for the 3 countries with the highest GDP per capita and the 3 countries with the lowest GDP per capita
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Unemployment rate for the top 3 countries varied slightly around 4, which was on the lower end of the unemployment rate range (<a href="#fig-unemp_rate" class="quarto-xref">Figure&nbsp;2</a>). Surprisingly, there was much greater variation in unemployment rate for the 3 countries with the lowest GDP per capita. There was a greater unemployment rate in the Central African Republic and Afghanistan, compared to the top 3 countries. This is not surprising, since a greater unemployment rate can be understood to indicate a weaker economy. However, Burundi has a very low unemployment rate, and lower than all the other 5 countries represented in <a href="#fig-unemp_rate" class="quarto-xref">Figure&nbsp;2</a>. Such a low unemployment rate could be due to the fact that unemployment is not even an option in Burundi. Agriculture employs more than 90% of the population, with coffee and tea being the main exports <span class="citation" data-cites="schwettmann2017burundi">(<a href="#ref-schwettmann2017burundi" role="doc-biblioref">Schwettmann 2017</a>)</span>. In a country that relies heavily on those exports, it can be understood how unemployment is considered “not an option”, resulting in the low unemployment rate.</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>This exploratory data analysis examined variables in the WDI dataset, including GDP per capita, life expectancy, and unemployment rate. It was found that there is a strong positive relationship between GDP per capita and life expectancy, and that unemployment rate can vary across vastly different GDP per capita values. These findings highlight the complex relationship between various economic indicators and social outcomes, with some being more intuitive than others. In the end, it is important to note that there are many other variables that influence the outcomes we see, and that each country has unique circumstances that must be taken into account in our analyses.</p>
 
-Unable to determine Axes to steal space for Colorbar. Using gca(), but will raise in the future. Either provide the *cax* argument to use as the Axes for the Colorbar, provide the *ax* argument to steal space from it, or add *mappable* to an Axes.
-</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="exploratory_da_files/figure-html/cell-4-output-2.png" width="914" height="564" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
 </section>
 
-</main>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-schwettmann2017burundi" class="csl-entry" role="listitem">
+Schwettmann, Jürgen. 2017. <span>“Jobs and Livelihoods for a Peaceful and Resilient Burundi.”</span> Geneva: International Labour Organization. <a href="https://www.ilo.org/wcmsp5/groups/public/---dgreports/---exrel/documents/publication/wcms_566283.pdf">https://www.ilo.org/wcmsp5/groups/public/---dgreports/---exrel/documents/publication/wcms_566283.pdf</a>.
+</div>
+<div id="ref-tarca2024" class="csl-entry" role="listitem">
+Țarcă, Viorel, Elena Țarcă, and Mihaela Moscalu. 2024. <span>“Social and Economic Determinants of Life Expectancy at Birth in Eastern Europe.”</span> Journal Article. <em>Healthcare (Basel, Switzerland)</em> 12. <a href="https://doi.org/10.3390/healthcare12111148">https://doi.org/10.3390/healthcare12111148</a>.
+</div>
+</div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
