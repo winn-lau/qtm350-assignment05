@@ -1,0 +1,129 @@
+---
+title: "Exploratory Data Analysis on WDI Data"
+author: "Winnie Lau"
+date: "2025-10-08"
+format:
+  revealjs:
+    slide-level: 2
+    theme: solarized
+    transition: zoom
+    scrollable: true
+    code-line-numbers: true
+    embed-resources: true
+editor:
+  render-on-save: true
+bibliography: references.bib
+suppress-bibliography: true
+---
+
+## Introduction
+
+Selected WDI data variables:
+
+:::{.incremental}
+- GDP per capita
+- Life expectancy
+- Unemployment rate
+:::
+
+## Summary Statistics
+```{python}
+#| echo: false
+#| eval: true
+#| label: tbl-summary_stats
+#| tbl-cap: Summary statistics for GDP per capita, life expectancy, and unemployment rate
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import cm, colors
+from matplotlib.ticker import FuncFormatter
+
+wdi = pd.read_csv("wdi.csv")
+
+# table of summary statistics for the 3 variables
+cols = ["gdp_per_capita", "life_expectancy", "unemployment_rate"]
+df_num = wdi[cols].dropna()
+
+stats = df_num.agg(["mean", "median", "min", "max", "std"]).T
+stats = stats.rename_axis("variable").reset_index()
+
+# round for display
+stats[["mean", "median", "min", "max", "std"]] = stats[["mean", "median", "min", "max", "std"]].round(2)
+
+display(stats)
+```
+
+## GDP per capita vs Life Expectancy
+```{python}
+#| echo: false
+#| eval: true
+#| label: fig-gdp_life_exp
+#| fig-cap: Scatterplot for the relationship between worldwide GDP per capita and life expectancy in 2022
+
+# gdp by life expectancy - scatterplot
+cols = ["gdp_per_capita", "life_expectancy"]
+df = wdi[cols].dropna()
+
+plt.figure(figsize=(8,6))
+plt.scatter(df["gdp_per_capita"], df["life_expectancy"], alpha=0.6)
+plt.xscale("log")
+plt.xlabel("GDP per capita (log scale)")
+plt.ylabel("Life expectancy (years)")
+plt.title("Worldwide GDP per capita vs Life Expectancy in 2022")
+plt.tight_layout()
+plt.show()
+
+```
+
+- Strong positive relationship between GDP per capita and life expectancy
+- High GDP = wealthy country = more resources to ensure high quality of life = greater life expectancy (and vice versa) [@tarca2024]
+
+## GDP per capita and Unemployment Rate 
+```{python}
+#| echo: false
+#| eval: true
+#| label: fig-unemp_rate
+#| fig-cap: Bar graph of unemployment rate for the 3 countries with the highest GDP per capita and the 3 countries with the lowest GDP per capita
+
+# Select top and bottom 3 countries by GDP per capita
+df = wdi[["country", "gdp_per_capita", "unemployment_rate"]].dropna()
+top_bottom = pd.concat([
+    df.nlargest(3, "gdp_per_capita"),
+    df.nsmallest(3, "gdp_per_capita")
+]).sort_values("gdp_per_capita", ascending=False)
+
+# Plot bar chart with color mapped to log GDP per capita
+log_gdp = np.log10(top_bottom["gdp_per_capita"])
+colors_ = cm.viridis((log_gdp - log_gdp.min()) / (log_gdp.max() - log_gdp.min()))
+
+fig, ax = plt.subplots(figsize=(10,6))
+bars = ax.bar(top_bottom["country"], top_bottom["unemployment_rate"], color=colors_)
+ax.set_xlabel("Country")
+ax.set_ylabel("Unemployment Rate")
+ax.set_title("Unemployment Rate for Top and Bottom Three GDP per Capita Countries")
+plt.xticks(rotation=45, ha="right")
+
+sm = cm.ScalarMappable(cmap=cm.viridis, norm=plt.Normalize(log_gdp.min(), log_gdp.max()))
+sm.set_array([])
+cbar = plt.colorbar(sm, ax=ax, fraction=0.046, pad=0.04)
+cbar.ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{10**v:.0f}"))
+cbar.set_label("GDP per capita (log scale)")
+
+plt.tight_layout()
+plt.show()
+
+```
+
+- Luxembourg, Norway, and Ireland landed in the top 3 countries with the highest GDP per capita, while Central African Republic, Afghanistan, and Burundi were in the bottom 3
+- High variation in unemployment rate for the 3 countries with the lowest GDP per capita
+- Burundi: very low unemployment rate, and lower than all the other 5 countries
+    - Agriculture employs more than 90% of the population, with coffee and tea being the main exports [@schwettmann2017burundi]
+    - In a country that relies heavily on those exports, it can be understood how unemployment is considered "not an option" -> low unemployment rate
+
+
+## Conclusion
+- Examined 3 variables in the WDI dataset: GDP per capita, life expectancy, and unemployment rate
+- Strong positive relationship between GDP per capita and life expectancy
+- Unemployment rate of countries can vary across vastly different GDP per capita values
+- There is a complex relationship between various economic indicators and social outcomes, and a multitude of factors must be considered to obtain the full picture

@@ -21,7 +21,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm, colors
-from matplotlib.ticker import FuncFormatter
 
 wdi = pd.read_csv("wdi.csv")
 
@@ -73,6 +72,8 @@ The relationship between GDP per capita and unemployment rate was also of intere
 #| eval: true
 #| label: fig-unemp_rate
 #| fig-cap: Bar graph of unemployment rate for the 3 countries with the highest GDP per capita and the 3 countries with the lowest GDP per capita
+
+from matplotlib.ticker import FuncFormatter
 
 # Select top and bottom 3 countries by GDP per capita
 df = wdi[["country", "gdp_per_capita", "unemployment_rate"]].dropna()
